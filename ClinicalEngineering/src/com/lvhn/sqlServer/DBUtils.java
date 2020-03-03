@@ -3,6 +3,7 @@ package com.lvhn.sqlServer;
 import java.sql.*;
 import java.util.*;
 
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.lvhn.model.Report;
@@ -46,7 +47,7 @@ public static List<Report> queryProcess1(String facility, String deptName, Strin
 		
 		 
 		  
-		   
+		 
 		String driverName = "com.mysql.jdbc.Driver";
 		String url = "jdbc:sqlserver://" + "lsnr_websql" + ":1433" + ";instance=" + "lsnr_websql";
 		String user = "webadm1n";
