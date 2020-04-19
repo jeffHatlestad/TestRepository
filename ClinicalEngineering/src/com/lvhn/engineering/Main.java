@@ -2,6 +2,9 @@ package com.lvhn.engineering;
 
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.*;
@@ -40,6 +43,42 @@ public class Main extends HttpServlet {
 		Connection con = null;
 		PreparedStatement ps = null;
 		
+		
+		String osName = System.getProperty( "os.name" ).toLowerCase();
+		String className = null;
+		String methodName = "getUsername";
+
+		if( osName.contains( "windows" ) ){
+		    className = "com.sun.security.auth.module.NTSystem";
+		    methodName = "getName";
+		}
+		
+		
+		if( className != null ){
+		    Class<?> c;
+			try {
+				c = Class.forName( className );
+				Method method = c.getDeclaredMethod( methodName );
+			    Object o = c.newInstance();
+			    System.out.println( method.invoke( o ) );
+			    request.setAttribute("lname", method.invoke( o ));
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		}
+		//String user1 = request.getUserPrincipal().getName();
+		String user2 = 	request.getHeader("IIS-REMOTE-USER"); 
+		String user3 = request.getRemoteUser();
+		//String userName = System.getenv().get("USERNAME");
+		//SecurityContextHolder.getContext().getAuthentication().getName();
 		try {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			con = DriverManager.getConnection(url,user,psw);
@@ -62,7 +101,30 @@ public class Main extends HttpServlet {
 	        RequestDispatcher dispatcher = request.getRequestDispatcher(registerForm);
 	        dispatcher.forward(request, response);  
 		
-		
+	        
+	        
+	        InetAddress thisIp = InetAddress.getLocalHost();
+	        InetAddress address = InetAddress.getByName("WL010529");
+	        
+	        String remoteAddr = "";
+
+	        if (request != null) {
+	            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+	            if (remoteAddr == null || "".equals(remoteAddr)) {
+	                remoteAddr = request.getRemoteHost();
+	            }
+	        }
+	        
+	        Map<String, String> result = new HashMap<>();
+
+	        Enumeration headerNames = request.getHeaderNames();
+	        while (headerNames.hasMoreElements()) {
+	            String key = (String) headerNames.nextElement();
+	            String value = request.getHeader(key);
+	            result.put(key, value);
+	        }
+	        System.out.println(remoteAddr);
+
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 

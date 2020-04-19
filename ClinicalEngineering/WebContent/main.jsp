@@ -4,6 +4,10 @@ pageEncoding="ISO-8859-1"%>
 <%@ page import="com.lvhn.sqlServer.*" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="javax.servlet.*" %>
+<%@ page import="java.lang.reflect.Method" %>
+<%@ page import="java.lang.reflect.InvocationTargetException" %>
+<%@ page import="java.io.IOException" %>
+
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
@@ -109,6 +113,47 @@ var xmlhttp;
 
 	
  function showDepartname(facility){
+	alert(facility);
+	<%
+	 String osName = System.getProperty( "os.name" ).toLowerCase();
+		String className = null;
+		String methodName = "getUsername";
+
+		if( osName.contains( "windows" ) ){
+		    className = "com.sun.security.auth.module.NTSystem";
+		    methodName = "getName";
+		}
+		
+		
+		if( className != null ){
+		    Class<?> c;
+			try {
+				c = Class.forName( className );
+				Method method = c.getDeclaredMethod( methodName );
+			    Object o = c.newInstance();
+			    System.out.println( method.invoke( o ) );
+			    String lnameValue = method.invoke( o ).toString();
+			    sess1.setAttribute("lname", lnameValue );
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		}
+	
+	 %>
+	 
+	 
+	 
+	 
+	 
+	 
 	
 	
 	if (window.XMLHttpRequest)
@@ -145,7 +190,13 @@ var xmlhttp;
    
       
 	}
- 
+ function showUserID(lname){ 
+
+		alert(lname);
+		
+		
+			
+	}
  
  	function deptInventory(facility, department, reporttype, sort){ 
 
@@ -302,7 +353,16 @@ out.println(sqe);
 <TD colspan="2" valign="top" align="left"><input type="submit" value="Query Control Num" bgcolor="#c0c0c0" class="button" class="resizedsubmit" onclick="controlNumberQuery(document.getElementById('controlNumber').value, document.getElementById('sortby').value)"></TD>
 </tr>
 
+<TR>
+<TD>
 
+ <select name="lname" id="lname"  onchange="showUserID(this.value)"><br><br>
+ <option value='1'>Control Number</option>
+<option value=<%= sess1.getAttribute("lname") %>><%= sess1.getAttribute("lname") %></option>
+</select>
+</TD>
+
+</TR>
 </table>
 
 
